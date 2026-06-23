@@ -40,6 +40,17 @@ cp -R <repo>/context-compressor ~/.claude/skills/context-compressor
 
 Restart your terminal AI session after installing.
 
+## One-Command Install
+
+From the repository root, run:
+
+```bash
+bash skills.sh
+```
+
+That installs every skill in the repo into both Codex and Claude skill folders. Use `bash skills.sh codex` or `bash skills.sh claude` to target one side only.
+On Windows, run it with Git Bash: `C:\Program Files\Git\bin\bash.exe skills.sh`.
+
 ## Usage
 
 Ask naturally:
