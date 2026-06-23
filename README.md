@@ -48,8 +48,18 @@ From the repository root, run:
 bash skills.sh
 ```
 
-That installs every skill in the repo into both Codex and Claude skill folders. Use `bash skills.sh codex` or `bash skills.sh claude` to target one side only.
+That installs every skill in the repo into both Codex and Claude skill folders. Use `bash skills.sh codex`, `bash skills.sh claude`, or `bash skills.sh ccswitch` to target one side only. `bash skills.sh all` installs to all three.
 On Windows, run it with Git Bash: `C:\Program Files\Git\bin\bash.exe skills.sh`.
+
+## cc-switch
+
+To make the skill searchable in cc-switch, install it into the cc-switch skills folder and refresh the local registry:
+
+```bash
+bash skills.sh ccswitch
+```
+
+This copies the skill into `~/.cc-switch/skills/context-compressor` and registers it in cc-switch's local database.
 
 ## Usage
 

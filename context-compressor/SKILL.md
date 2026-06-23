@@ -1,6 +1,6 @@
 ---
 name: context-compressor
-description: Terminal AI context compression and project session persistence for Codex CLI, Claude Code, WorkBuddy, and similar command-line AI workflows. Use whenever the user asks to compress or save project context, persist or resume a terminal AI session, create searchable session summaries, recall prior decisions, mark milestones, inspect context-store status, or implement commands like /compress, /recall, /summarize, /status, /milestone. Also use for Chinese requests such as 压缩上下文, 保存上下文, 总结本轮会话, 续接/恢复会话, 召回之前进展, 记录里程碑, 查看上下文状态, or 让终端 AI 记住项目进度. Use at explicit session start/end handoff moments to load or refresh PROJECT.md, CONTEXT.md, INDEX.md, and sessions in the skill-local context-store directory beside SKILL.md.
+description: Terminal AI context compression and project session persistence for Codex CLI, Claude Code, cc-switch, WorkBuddy, and similar command-line AI workflows. Use whenever the user asks to compress or save project context, persist or resume a terminal AI session, create searchable session summaries, recall prior decisions, mark milestones, inspect context-store status, or implement commands like /compress, /recall, /summarize, /status, /milestone. Also use for Chinese requests such as 压缩上下文, 保存上下文, 总结本轮会话, 续接/恢复会话, 召回之前进展, 记录里程碑, 查看上下文状态, or 让终端 AI 记住项目进度. Use at explicit session start/end handoff moments to load or refresh PROJECT.md, CONTEXT.md, INDEX.md, and sessions in the skill-local context-store directory beside SKILL.md.
 ---
 
 # Context Compressor
