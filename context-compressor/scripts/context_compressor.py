@@ -20,7 +20,8 @@ from typing import Iterable
 
 
 DEFAULT_BUDGET_BYTES = 1_000_000
-DEFAULT_STORE = Path.home() / ".workbuddy" / "context-store"
+SKILL_DIR = Path(__file__).resolve().parents[1]
+DEFAULT_STORE = SKILL_DIR / "context-store"
 TEXT_READ_LIMIT_BYTES = 256_000
 SNIPPET_LINE_LIMIT = 80
 
@@ -48,6 +49,7 @@ IGNORE_DIRS = {
     "venv",
     "env",
     ".env",
+    "context-store",
 }
 
 IGNORE_FILES = {
@@ -735,7 +737,7 @@ def status(args: argparse.Namespace) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Compress, persist, and recall project context.")
     parser.add_argument("--project", help="Project root path. Defaults to current working directory.")
-    parser.add_argument("--store", help="Context store path. Defaults to WORKBUDDY_CONTEXT_STORE or ~/.workbuddy/context-store.")
+    parser.add_argument("--store", help="Context store path. Defaults to WORKBUDDY_CONTEXT_STORE or the skill-local context-store directory.")
     sub = parser.add_subparsers(dest="command", required=True)
 
     init_cmd = sub.add_parser("init", help="Create the project context store skeleton.")

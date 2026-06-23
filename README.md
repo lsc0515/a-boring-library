@@ -1,6 +1,6 @@
 # Context Compressor Skill
 
-`context-compressor` is a Codex/Claude Code skill for compressing, saving, and recalling terminal AI project context. It creates a local project memory store with `PROJECT.md`, `CONTEXT.md`, `INDEX.md`, session summaries, milestones, and snapshots under `~/.workbuddy/context-store`.
+`context-compressor` is a Codex/Claude Code skill for compressing, saving, and recalling terminal AI project context. It creates a local project memory store with `PROJECT.md`, `CONTEXT.md`, `INDEX.md`, session summaries, milestones, and snapshots under the skill folder's `context-store/` directory.
 
 ## Install For Codex
 
@@ -69,6 +69,16 @@ python context-compressor/scripts/context_compressor.py --project /path/to/proje
 python context-compressor/scripts/context_compressor.py --project /path/to/project status --json
 python context-compressor/scripts/context_compressor.py --project /path/to/project recall "decision keyword"
 ```
+
+## Memory Location
+
+By default, memory is stored beside the skill:
+
+```text
+context-compressor/context-store/projects/{project-hash}/
+```
+
+Each installed copy of the skill has its own local memory store. To use a different location, pass `--store /custom/context-store` or set `WORKBUDDY_CONTEXT_STORE`.
 
 ## Repository Contents
 

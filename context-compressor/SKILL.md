@@ -1,13 +1,15 @@
 ---
 name: context-compressor
-description: Terminal AI context compression and project session persistence for Codex CLI, Claude Code, WorkBuddy, and similar command-line AI workflows. Use whenever the user asks to compress or save project context, persist or resume a terminal AI session, create searchable session summaries, recall prior decisions, mark milestones, inspect context-store status, or implement commands like /compress, /recall, /summarize, /status, /milestone. Also use for Chinese requests such as 压缩上下文, 保存上下文, 总结本轮会话, 续接/恢复会话, 召回之前进展, 记录里程碑, 查看上下文状态, or 让终端 AI 记住项目进度. Use at explicit session start/end handoff moments to load or refresh PROJECT.md, CONTEXT.md, INDEX.md, and sessions in a local ~/.workbuddy/context-store.
+description: Terminal AI context compression and project session persistence for Codex CLI, Claude Code, WorkBuddy, and similar command-line AI workflows. Use whenever the user asks to compress or save project context, persist or resume a terminal AI session, create searchable session summaries, recall prior decisions, mark milestones, inspect context-store status, or implement commands like /compress, /recall, /summarize, /status, /milestone. Also use for Chinese requests such as 压缩上下文, 保存上下文, 总结本轮会话, 续接/恢复会话, 召回之前进展, 记录里程碑, 查看上下文状态, or 让终端 AI 记住项目进度. Use at explicit session start/end handoff moments to load or refresh PROJECT.md, CONTEXT.md, INDEX.md, and sessions in the skill-local context-store directory beside SKILL.md.
 ---
 
 # Context Compressor
 
 ## Overview
 
-Use this skill to create and maintain a local, project-scoped memory store that keeps the next Codex session grounded without loading the entire repository or conversation history. It stores compact context in `PROJECT.md`, `CONTEXT.md`, `INDEX.md`, daily session summaries, and snapshots under `~/.workbuddy/context-store/projects/{project-hash}/`.
+Use this skill to create and maintain a local, project-scoped memory store that keeps the next Codex session grounded without loading the entire repository or conversation history. It stores compact context in `PROJECT.md`, `CONTEXT.md`, `INDEX.md`, daily session summaries, and snapshots under `<skill-folder>/context-store/projects/{project-hash}/` by default.
+
+The default store lives in the same skill folder as `SKILL.md`, so each installed copy of the skill keeps its own local memory. Override it with `--store` or `WORKBUDDY_CONTEXT_STORE` only when the user explicitly wants a shared or custom store.
 
 The bundled script is deterministic and standard-library only:
 
@@ -59,7 +61,7 @@ python scripts/context_compressor.py --project /path/to/project summarize \
   --title "Implemented context compressor skill" \
   --phase "Phase 1" \
   --completed "Created store skeleton and compression script" \
-  --decision "Use local ~/.workbuddy/context-store with project-hash isolation" \
+  --decision "Use skill-local context-store with project-hash isolation" \
   --changed-file "context-compressor/scripts/context_compressor.py" \
   --next-step "Wire external terminal hooks if automation is needed" \
   --note "Skill scripts use only Python standard library"

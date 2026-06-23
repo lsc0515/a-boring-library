@@ -34,4 +34,5 @@ Thumbs.db
 # Local context stores and generated session data should not be published.
 .workbuddy/
 context-store/
+context-compressor/context-store/
 *-workspace/
