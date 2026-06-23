@@ -1,0 +1,6 @@
+interface:
+  display_name: "Context Compressor"
+  short_description: "Compress and recall project context"
+  default_prompt: "Use $context-compressor to compress this project context and prepare a resumable session summary."
+policy:
+  allow_implicit_invocation: true
