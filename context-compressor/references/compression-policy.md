@@ -1,59 +1,59 @@
-# Compression Policy
+# 压缩策略
 
-## Layers
+## 分层
 
-| Layer | File or Directory | Purpose | Target Size |
+| 层级 | 文件或目录 | 作用 | 目标大小 |
 | --- | --- | --- | --- |
-| 0 | `PROJECT.md` | Project identity, current status, latest session pointer, durable milestones | ~5 KB |
-| 1 | `CONTEXT.md` | Compact working context with high-value file excerpts and latest session | <= 1 MB |
-| 2 | `INDEX.md` and latest `snapshots/` | File tree, symbols, TODO/FIXME markers, JSON lookup data | ~300 KB |
-| 3 | `sessions/` and older `snapshots/` | Full local archive for recall and handoff | unbounded |
+| 0 | `PROJECT.md` | 项目身份、当前状态、最新会话指针、持久里程碑 | 约 5 KB |
+| 1 | `CONTEXT.md` | 紧凑的工作上下文，包含高价值文件摘录和最新会话 | <= 1 MB |
+| 2 | `INDEX.md` 和最新的 `snapshots/` | 文件树、符号、TODO/FIXME 标记、JSON 形式的查找数据 | 约 300 KB |
+| 3 | `sessions/` 和更早的 `snapshots/` | 用于召回和交接的完整本地归档 | 无上限 |
 
-## Priority Order
+## 优先级顺序
 
-1. Current state, blockers, and next steps.
-2. User decisions, constraints, and explicit reminders.
-3. Files changed in the latest session.
-4. Config files, package manifests, and entry points.
-5. Recently modified source files.
-6. Symbol names, API signatures, TODO/FIXME markers.
-7. Older session records and low-score file paths.
+1. 当前状态、阻塞项和下一步。
+2. 用户决定、约束和显式提醒。
+3. 最新会话中修改过的文件。
+4. 配置文件、包清单和入口点。
+5. 最近修改的源码文件。
+6. 符号名称、API 签名、TODO/FIXME 标记。
+7. 更早的会话记录和低分路径。
 
-## File Compression
+## 文件压缩
 
-- Keep full excerpts only for small, high-score text files.
-- Store paths and metadata for binary, generated, lock, and large files.
-- Extract symbols from common Python, JavaScript/TypeScript, Go, and Rust declarations.
-- Keep TODO/FIXME markers with file and line number.
-- Store full file tree and symbol maps as JSON snapshots for deterministic lookup.
+- 只有在小型、高分文本文件中，才保留完整摘录。
+- 二进制文件、生成文件、锁文件和大文件只记录路径和元数据。
+- 提取常见 Python、JavaScript/TypeScript、Go 和 Rust 声明中的符号。
+- TODO/FIXME 标记要保留文件名和行号。
+- 把完整文件树和符号映射存成 JSON 快照，便于确定性查找。
 
-## Session Compression
+## 会话压缩
 
-Use structured summaries instead of full transcripts unless the user explicitly marks a milestone or asks to preserve raw notes.
+除非用户明确要求保留原始记录或标记为里程碑，否则请使用结构化摘要，而不是完整对话记录。
 
-Keep:
+保留：
 
-- Completed tasks.
-- Key decisions and rejected alternatives when relevant.
-- Changed files.
-- Commands or verification results that matter for continuation.
-- Current blockers.
-- Next steps.
-- Environment details that future sessions could otherwise miss.
+- 已完成的任务。
+- 关键决定以及与之相关的替代方案。
+- 变更文件。
+- 对继续工作有意义的命令或验证结果。
+- 当前阻塞项。
+- 下一步。
+- 未来会话可能会漏掉的环境信息。
 
-Avoid:
+避免：
 
-- Secrets, tokens, private keys, credentials, and `.env` values.
-- Long command output unless it contains a decision-relevant error.
-- Repeated status chatter.
-- Generic explanation that can be reconstructed from code.
+- 密钥、令牌、私钥、凭证和 `.env` 值。
+- 除非包含决策相关错误，否则不要保存冗长命令输出。
+- 重复的状态闲聊。
+- 可以从代码中重新推导出来的泛泛解释。
 
-## Budget Tuning
+## 预算调节
 
-The default `--budget 1000000` caps `CONTEXT.md` around one megabyte. Lower the budget for small model contexts or large repos with many high-value files:
+默认的 `--budget 1000000` 会把 `CONTEXT.md` 限制在约 1 MB。对于更小的模型上下文或包含很多高价值文件的大仓库，可以降低预算：
 
 ```bash
 python scripts/context_compressor.py --project /path/to/project compress --budget 300000
 ```
 
-Raise it only when the caller can safely load more context. The script truncates `CONTEXT.md` rather than omitting `PROJECT.md`, `INDEX.md`, sessions, or snapshots.
+只有在调用方能够安全地加载更多上下文时，才提高预算。脚本会截断 `CONTEXT.md`，而不是省略 `PROJECT.md`、`INDEX.md`、sessions 或 snapshots。

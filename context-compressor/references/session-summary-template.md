@@ -1,33 +1,33 @@
-# Session Summary Template
+# 会话摘要模板
 
-Use this structure when writing summaries manually or reviewing output from `scripts/context_compressor.py summarize`.
+在手动编写摘要或审阅 `scripts/context_compressor.py summarize` 的输出时，请使用下面这个结构。
 
 ```markdown
-# Session Summary - YYYY-MM-DD
+# 会话摘要 - YYYY-MM-DD
 
-## Current Status
-- Project: {project name}
-- Phase: {current development phase}
-- Blocker: {blocking issue or none}
-- Title: {short session title}
+## 当前状态
+- 项目：{项目名称}
+- 阶段：{当前开发阶段}
+- 阻塞项：{阻塞问题或无}
+- 标题：{简短会话标题}
 
-## Completed
-- {completed task}
+## 已完成
+- {已完成任务}
 
-## Key Decisions
-- {decision and reason}
+## 关键决定
+- {决定及原因}
 
-## Changed Files
-- {path} ({change type or purpose})
+## 变更文件
+- {路径}（变更类型或用途）
 
-## Next Steps
-- {next action}
+## 下一步
+- {下一步动作}
 
-## Important Reminders
-- {configuration, environment, command, or constraint to preserve}
+## 重要提醒
+- {需要保留的配置、环境、命令或约束}
 
-## Raw Notes
-{optional raw notes when the user explicitly asks to preserve them}
+## 原始记录
+{可选原始记录，仅在用户明确要求保留时填写}
 ```
 
-Keep each bullet concrete enough for a future agent to act without rereading the full transcript.
+每条要点都尽量具体，这样未来的代理不用重新读完整段对话也能直接接手。

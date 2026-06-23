@@ -1,10 +1,10 @@
-# Context Compressor Skill
+# 上下文压缩技能
 
-`context-compressor` is a Codex/Claude Code skill for compressing, saving, and recalling terminal AI project context. It creates a local project memory store with `PROJECT.md`, `CONTEXT.md`, `INDEX.md`, session summaries, milestones, and snapshots under the skill folder's `context-store/` directory.
+`context-compressor` 是一个面向 Codex、Claude Code、cc-switch 等终端 AI 的技能，用来压缩、保存和召回项目上下文。它会在技能目录旁创建本地项目记忆库，保存 `PROJECT.md`、`CONTEXT.md`、`INDEX.md`、会话摘要、里程碑和快照。
 
-## Install For Codex
+## 安装到 Codex
 
-Clone this repository, then copy or link the skill folder into your Codex skills directory.
+克隆本仓库，然后把技能目录复制或链接到 Codex 的技能目录中。
 
 ### Windows PowerShell
 
@@ -13,7 +13,7 @@ git clone https://github.com/<owner>/<repo>.git
 Copy-Item -Recurse .\<repo>\context-compressor "$env:USERPROFILE\.codex\skills\context-compressor"
 ```
 
-### macOS/Linux
+### macOS / Linux
 
 ```bash
 git clone https://github.com/<owner>/<repo>.git
@@ -21,7 +21,7 @@ mkdir -p ~/.codex/skills
 cp -R <repo>/context-compressor ~/.codex/skills/context-compressor
 ```
 
-## Install For Claude Code
+## 安装到 Claude Code
 
 ### Windows PowerShell
 
@@ -30,7 +30,7 @@ git clone https://github.com/<owner>/<repo>.git
 Copy-Item -Recurse .\<repo>\context-compressor "$env:USERPROFILE\.claude\skills\context-compressor"
 ```
 
-### macOS/Linux
+### macOS / Linux
 
 ```bash
 git clone https://github.com/<owner>/<repo>.git
@@ -38,82 +38,83 @@ mkdir -p ~/.claude/skills
 cp -R <repo>/context-compressor ~/.claude/skills/context-compressor
 ```
 
-Restart your terminal AI session after installing.
+安装后请重启终端 AI 会话。
 
-## One-Command Install
+## 一键安装
 
-From the repository root, run:
+在仓库根目录运行：
 
 ```bash
 bash skills.sh
 ```
 
-That installs every skill in the repo into both Codex and Claude skill folders. Use `bash skills.sh codex`, `bash skills.sh claude`, or `bash skills.sh ccswitch` to target one side only. `bash skills.sh all` installs to all three.
-On Windows, the simplest option is the cmd wrapper:
+这会把仓库里的每个技能安装到 Codex 和 Claude 的技能目录中。你也可以使用 `bash skills.sh codex`、`bash skills.sh claude` 或 `bash skills.sh ccswitch` 只安装到指定目标；`bash skills.sh all` 会安装到全部三个目标。
+
+在 Windows 上，最简单的是使用 cmd 包装器：
 
 ```powershell
 .\skills.cmd ccswitch
 ```
 
-If you're staying in PowerShell and want to call the script directly, use:
+如果你想直接在 PowerShell 中执行脚本，可以这样运行：
 
 ```powershell
 .\skills.ps1
 ```
 
-The PowerShell version accepts the same targets: `codex`, `claude`, `ccswitch`, `both`, and `all`.
+PowerShell 版本支持相同的目标参数：`codex`、`claude`、`ccswitch`、`both` 和 `all`。
 
 ## cc-switch
 
-To make the skill searchable in cc-switch, install it into the cc-switch skills folder and refresh the local registry:
+要让技能能在 cc-switch 中被检索到，请把它安装到 cc-switch 的技能目录，并刷新本地注册表：
 
 ```bash
 bash skills.sh ccswitch
 ```
 
-This copies the skill into `~/.cc-switch/skills/context-compressor` and registers it in cc-switch's local database.
+这会把技能复制到 `~/.cc-switch/skills/context-compressor`，并注册到 cc-switch 的本地数据库。
 
-## Usage
+## 使用方式
 
-Ask naturally:
-
-```text
-Compress this project context so I can resume later.
-```
-
-Or invoke the skill explicitly:
+直接自然地说：
 
 ```text
-Use $context-compressor to summarize this session and save project context.
+压缩这个项目的上下文，方便我之后继续。
 ```
 
-Chinese prompts are supported by the skill description:
+或者显式调用技能：
+
+```text
+使用 $context-compressor 总结这次会话并保存项目上下文。
+```
+
+技能描述支持中文提示：
 
 ```text
 压缩一下当前项目上下文，方便下次恢复
 ```
 
-## Direct Script Usage
+## 直接运行脚本
 
-The bundled script uses only the Python standard library, so it can also be run directly:
+内置脚本只依赖 Python 标准库，因此也可以直接运行：
 
 ```bash
 python context-compressor/scripts/context_compressor.py --project /path/to/project compress
 python context-compressor/scripts/context_compressor.py --project /path/to/project status --json
-python context-compressor/scripts/context_compressor.py --project /path/to/project recall "decision keyword"
+python context-compressor/scripts/context_compressor.py --project /path/to/project recall "决策关键词"
 ```
 
-## Memory Location
+## 记忆位置
 
-By default, memory is stored beside the skill:
+默认情况下，记忆会存放在技能旁边：
 
 ```text
 context-compressor/context-store/projects/{project-hash}/
 ```
 
-Each installed copy of the skill has its own local memory store. To use a different location, pass `--store /custom/context-store` or set `WORKBUDDY_CONTEXT_STORE`.
+每个安装副本都有自己独立的本地记忆库。若要使用其他位置，可以传入 `--store /custom/context-store`，或者设置 `WORKBUDDY_CONTEXT_STORE`。
 
-## Repository Contents
+## 仓库内容
 
 ```text
 context-compressor/
@@ -123,4 +124,4 @@ context-compressor/
   scripts/context_compressor.py
 ```
 
-Only the `context-compressor/` folder is the skill. The repository-level `README.md` is for GitHub users.
+只有 `context-compressor/` 文件夹是技能本体。仓库根目录的 `README.md` 只是给 GitHub 用户看的说明。

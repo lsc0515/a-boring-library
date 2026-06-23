@@ -3,10 +3,10 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: bash skills.sh [codex|claude|ccswitch|both|all]
+用法：bash skills.sh [codex|claude|ccswitch|both|all]
 
-Install every skill directory in this repository into the selected skills
-folder(s). The default target is both Codex and Claude.
+把本仓库中的每个技能目录安装到所选的技能目录中。
+默认目标是 Codex 和 Claude。
 EOF
 }
 
@@ -48,7 +48,7 @@ case "$target_mode" in
     exit 0
     ;;
   *)
-    printf 'Unknown target: %s\n\n' "$target_mode" >&2
+    printf '未知目标：%s\n\n' "$target_mode" >&2
     usage >&2
     exit 1
     ;;
@@ -64,7 +64,7 @@ done
 shopt -u nullglob
 
 if [[ ${#skill_dirs[@]} -eq 0 ]]; then
-  printf 'No skill directories found under %s\n' "$repo_root" >&2
+  printf '在 %s 下没有找到技能目录\n' "$repo_root" >&2
   exit 1
 fi
 
@@ -206,7 +206,7 @@ install_skill() {
   if [[ "$dest_root" == "$HOME/.cc-switch/skills" ]]; then
     register_ccswitch_skill "$src" "$dest"
   fi
-  printf 'Installed %s -> %s\n' "$skill_name" "$dest"
+  printf '已安装 %s -> %s\n' "$skill_name" "$dest"
 }
 
 for target in "${targets[@]}"; do

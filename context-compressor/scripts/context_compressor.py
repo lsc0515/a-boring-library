@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Project context compression and recall utility.
+"""项目上下文压缩与召回工具。
 
-This script intentionally uses only the Python standard library so it can run
-inside a Codex skill without extra installation steps.
+这个脚本刻意只使用 Python 标准库，因此可以在 Codex 技能里直接运行，
+不需要额外安装步骤。
 """
 
 from __future__ import annotations
@@ -191,7 +191,7 @@ class ByteBudgetWriter:
         remaining = self.budget - self.used
         if remaining > 128:
             clipped = text.encode("utf-8")[: remaining - 64].decode("utf-8", errors="ignore")
-            self.parts.append(clipped.rstrip() + "\n\n[truncated to budget]\n")
+            self.parts.append(clipped.rstrip() + "\n\n[已根据预算截断]\n")
             self.used = len("".join(self.parts).encode("utf-8"))
         self.truncated = True
         return False
@@ -348,11 +348,11 @@ def extract_todos(text: str, max_todos: int = 40) -> list[tuple[int, str]]:
 
 
 def summarize_file(rel_path: str, size: int, symbols: list[str], todos: list[tuple[int, str]]) -> str:
-    parts = [f"{rel_path} ({size} bytes)"]
+    parts = [f"{rel_path}（{size} 字节）"]
     if symbols:
-        parts.append("symbols: " + ", ".join(symbols[:12]))
+        parts.append("符号：" + ", ".join(symbols[:12]))
     if todos:
-        parts.append(f"{len(todos)} TODO/FIXME marker(s)")
+        parts.append(f"{len(todos)} 个 TODO/FIXME 标记")
     return "; ".join(parts)
 
 
@@ -401,15 +401,15 @@ def scan_project(project_root: Path) -> list[FileInfo]:
 def render_file_tree(files: list[FileInfo], limit: int = 400) -> str:
     lines = ["```text\n"]
     for info in sorted(files, key=lambda item: item.path)[:limit]:
-        lines.append(f"{info.path} ({info.size} bytes)\n")
+        lines.append(f"{info.path}（{info.size} 字节）\n")
     if len(files) > limit:
-        lines.append(f"... {len(files) - limit} more files omitted\n")
+        lines.append(f"... 还有 {len(files) - limit} 个文件未显示\n")
     lines.append("```\n")
     return "".join(lines)
 
 
 def render_symbols(files: list[FileInfo], limit: int = 300) -> str:
-    lines = ["| File | Symbols |\n", "| --- | --- |\n"]
+    lines = ["| 文件 | 符号 |\n", "| --- | --- |\n"]
     count = 0
     for info in files:
         if not info.symbols:
@@ -419,7 +419,7 @@ def render_symbols(files: list[FileInfo], limit: int = 300) -> str:
         if count >= limit:
             break
     if count == 0:
-        lines.append("| _none found_ | |\n")
+        lines.append("| _未找到_ | |\n")
     return "".join(lines)
 
 
@@ -432,7 +432,7 @@ def render_todos(files: list[FileInfo], limit: int = 120) -> str:
             count += 1
             if count >= limit:
                 return "".join(lines)
-    return "".join(lines) if lines else "- None found.\n"
+    return "".join(lines) if lines else "- 未找到。\n"
 
 
 def write_snapshot(paths: ProjectPaths, files: list[FileInfo]) -> Path:
@@ -465,47 +465,47 @@ def latest_session(paths: ProjectPaths) -> Path | None:
 def read_latest_session_excerpt(paths: ProjectPaths, max_bytes: int = 16_000) -> str:
     session = latest_session(paths)
     if not session:
-        return "No prior session summary found.\n"
+        return "未找到之前的会话摘要。\n"
     text = read_text_limited(session, max_bytes)
-    return f"Source: `{session.name}`\n\n{text.strip()}\n"
+    return f"来源：`{session.name}`\n\n{text.strip()}\n"
 
 
 def write_project_md(paths: ProjectPaths, files: list[FileInfo], context_bytes: int, phase: str | None = None, status: str | None = None) -> None:
     session = latest_session(paths)
     lines = [
-        f"# {paths.project_root.name} Project Memory\n\n",
-        "## Core Metadata\n",
-        f"- Project: {paths.project_root.name}\n",
-        f"- Path: {paths.project_root}\n",
-        f"- Project ID: {paths.project_id}\n",
-        f"- Updated: {utc_now()}\n",
-        f"- Current phase: {phase or 'unspecified'}\n",
-        f"- Current status: {status or 'context compressed'}\n",
-        f"- Last session: {session.name if session else 'none'}\n",
-        f"- Files indexed: {len(files)}\n",
-        f"- Context bytes: {context_bytes}\n\n",
-        "## Current State\n",
-        "- Load `CONTEXT.md` first for the compact working set.\n",
-        "- Load `INDEX.md` when file tree, symbol, or TODO lookup is needed.\n",
-        "- Search `sessions/` for older decisions and handoffs.\n\n",
-        "## Permanent Milestones\n",
-        "- Add durable milestones with `context_compressor.py milestone --message \"...\"`.\n",
+        f"# {paths.project_root.name} 项目记忆\n\n",
+        "## 核心元数据\n",
+        f"- 项目：{paths.project_root.name}\n",
+        f"- 路径：{paths.project_root}\n",
+        f"- 项目 ID：{paths.project_id}\n",
+        f"- 更新时间：{utc_now()}\n",
+        f"- 当前阶段：{phase or '未指定'}\n",
+        f"- 当前状态：{status or '上下文已压缩'}\n",
+        f"- 上次会话：{session.name if session else '无'}\n",
+        f"- 已索引文件：{len(files)}\n",
+        f"- 上下文字节数：{context_bytes}\n\n",
+        "## 当前状态\n",
+        "- 先读 `CONTEXT.md`，获取紧凑工作集。\n",
+        "- 需要文件树、符号或 TODO 查询时，再读 `INDEX.md`。\n",
+        "- 更早的决定和交接，去 `sessions/` 里搜索。\n\n",
+        "## 持久里程碑\n",
+        "- 使用 `context_compressor.py milestone --message \"...\"` 添加需要长期保留的里程碑。\n",
     ]
     (paths.project_dir / "PROJECT.md").write_text("".join(lines), encoding="utf-8")
 
 
 def write_index_md(paths: ProjectPaths, files: list[FileInfo], snapshot_dir: Path) -> None:
     lines = [
-        f"# {paths.project_root.name} Context Index\n\n",
-        f"- Generated: {utc_now()}\n",
-        f"- Project ID: {paths.project_id}\n",
-        f"- Snapshot: `{snapshot_dir.name}`\n",
-        f"- Files indexed: {len(files)}\n\n",
-        "## File Tree\n\n",
+        f"# {paths.project_root.name} 上下文索引\n\n",
+        f"- 生成时间：{utc_now()}\n",
+        f"- 项目 ID：{paths.project_id}\n",
+        f"- 快照：`{snapshot_dir.name}`\n",
+        f"- 已索引文件：{len(files)}\n\n",
+        "## 文件树\n\n",
         render_file_tree(files),
-        "\n## Symbols\n\n",
+        "\n## 符号\n\n",
         render_symbols(files),
-        "\n## TODO And FIXME Markers\n\n",
+        "\n## TODO 和 FIXME 标记\n\n",
         render_todos(files),
     ]
     (paths.project_dir / "INDEX.md").write_text("".join(lines), encoding="utf-8")
@@ -515,7 +515,7 @@ def format_excerpt(text: str, max_lines: int = SNIPPET_LINE_LIMIT) -> str:
     lines = text.splitlines()
     clipped = "\n".join(lines[:max_lines])
     if len(lines) > max_lines:
-        clipped += f"\n... {len(lines) - max_lines} more lines omitted"
+        clipped += f"\n... 还有 {len(lines) - max_lines} 行未显示"
     return clipped
 
 
@@ -525,47 +525,47 @@ def write_context_md(paths: ProjectPaths, files: list[FileInfo], budget: int) ->
     text_files = sum(1 for info in files if info.is_text)
 
     writer.append(
-        f"# {paths.project_root.name} Compressed Context\n\n"
-        f"- Generated: {utc_now()}\n"
-        f"- Project path: `{paths.project_root}`\n"
-        f"- Project ID: `{paths.project_id}`\n"
-        f"- Files indexed: {len(files)} ({text_files} text)\n"
-        f"- Raw indexed size: {total_size} bytes\n"
-        f"- Budget: {budget} bytes\n\n"
+        f"# {paths.project_root.name} 压缩上下文\n\n"
+        f"- 生成时间：{utc_now()}\n"
+        f"- 项目路径：`{paths.project_root}`\n"
+        f"- 项目 ID：`{paths.project_id}`\n"
+        f"- 已索引文件：{len(files)}（{text_files} 个文本文件）\n"
+        f"- 原始索引大小：{total_size} 字节\n"
+        f"- 预算：{budget} 字节\n\n"
     )
 
-    writer.append("## How To Resume\n\n")
+    writer.append("## 如何恢复\n\n")
     writer.append(
-        "1. Read `PROJECT.md` for status and durable milestones.\n"
-        "2. Use this file as the compact working context.\n"
-        "3. Read `INDEX.md` for file tree, symbols, and TODO lookup.\n"
-        "4. Search `sessions/` for older decisions before guessing.\n\n"
+        "1. 先读 `PROJECT.md`，看状态和持久里程碑。\n"
+        "2. 把这个文件当作紧凑工作上下文。\n"
+        "3. 需要文件树、符号和 TODO 查询时，再读 `INDEX.md`。\n"
+        "4. 在猜测之前，先去 `sessions/` 里找更早的决定。\n\n"
     )
 
-    writer.append("## Latest Session\n\n")
+    writer.append("## 最新会话\n\n")
     writer.append(read_latest_session_excerpt(paths))
     writer.append("\n")
 
-    writer.append("## High-Value Files\n\n")
+    writer.append("## 高价值文件\n\n")
     for info in files[:80]:
         writer.append(f"### `{info.path}`\n\n")
-        writer.append(f"- Size: {info.size} bytes\n- Score: {info.score}\n")
+        writer.append(f"- 大小：{info.size} 字节\n- 分数：{info.score}\n")
         if info.symbols:
-            writer.append(f"- Symbols: {', '.join(info.symbols[:24])}\n")
+            writer.append(f"- 符号：{', '.join(info.symbols[:24])}\n")
         if info.todos:
-            writer.append(f"- TODO/FIXME: {len(info.todos)} marker(s)\n")
+            writer.append(f"- TODO/FIXME：{len(info.todos)} 个标记\n")
         if info.is_text and info.size <= TEXT_READ_LIMIT_BYTES:
             try:
                 excerpt = format_excerpt(read_text_limited(info.abs_path), SNIPPET_LINE_LIMIT)
                 writer.append("\n```text\n" + excerpt.rstrip() + "\n```\n\n")
             except OSError:
-                writer.append("\n[unreadable]\n\n")
+                writer.append("\n[无法读取]\n\n")
         else:
-            writer.append("\n[large or non-text file; see index/snapshot]\n\n")
+            writer.append("\n[大文件或非文本文件；请查看索引/快照]\n\n")
         if writer.truncated:
             break
 
-    writer.append("## TODO And FIXME Markers\n\n")
+    writer.append("## TODO 和 FIXME 标记\n\n")
     writer.append(render_todos(files))
     writer.append("\n")
 
@@ -581,7 +581,7 @@ def compress_project(args: argparse.Namespace) -> None:
     snapshot_dir = write_snapshot(paths, files)
     write_index_md(paths, files, snapshot_dir)
     context_bytes = write_context_md(paths, files, args.budget)
-    write_project_md(paths, files, context_bytes, phase=args.phase, status="context compressed")
+    write_project_md(paths, files, context_bytes, phase=args.phase, status="上下文已压缩")
     update_global_index(
         paths,
         {
@@ -591,21 +591,21 @@ def compress_project(args: argparse.Namespace) -> None:
             "project_dir": str(paths.project_dir),
         },
     )
-    print(f"Compressed {len(files)} files into {context_bytes} bytes")
-    print(f"Project store: {paths.project_dir}")
+    print(f"已将 {len(files)} 个文件压缩到 {context_bytes} 字节")
+    print(f"项目存储位置：{paths.project_dir}")
 
 
 def init_project(args: argparse.Namespace) -> None:
     paths = get_paths(args.project, args.store)
     ensure_store(paths)
     if not (paths.project_dir / "PROJECT.md").exists():
-        write_project_md(paths, [], 0, phase=args.phase, status="initialized")
+        write_project_md(paths, [], 0, phase=args.phase, status="已初始化")
     if not (paths.project_dir / "CONTEXT.md").exists():
-        (paths.project_dir / "CONTEXT.md").write_text("# Compressed Context\n\nNo context has been generated yet.\n", encoding="utf-8")
+        (paths.project_dir / "CONTEXT.md").write_text("# 压缩上下文\n\n尚未生成任何上下文。\n", encoding="utf-8")
     if not (paths.project_dir / "INDEX.md").exists():
-        (paths.project_dir / "INDEX.md").write_text("# Context Index\n\nNo index has been generated yet.\n", encoding="utf-8")
+        (paths.project_dir / "INDEX.md").write_text("# 上下文索引\n\n尚未生成任何索引。\n", encoding="utf-8")
     update_global_index(paths, {"project_dir": str(paths.project_dir)})
-    print(f"Initialized context store: {paths.project_dir}")
+    print(f"已初始化上下文存储：{paths.project_dir}")
 
 
 def append_lines(title: str, items: list[str]) -> list[str]:
@@ -613,7 +613,7 @@ def append_lines(title: str, items: list[str]) -> list[str]:
     if items:
         lines.extend(f"- {item}\n" for item in items)
     else:
-        lines.append("- None recorded.\n")
+        lines.append("- 未记录。\n")
     lines.append("\n")
     return lines
 
@@ -628,22 +628,22 @@ def summarize_session(args: argparse.Namespace) -> None:
         raw_notes = Path(args.from_file).expanduser().read_text(encoding="utf-8")
 
     lines = [
-        f"# Session Summary - {date}\n\n",
-        "## Current Status\n",
-        f"- Project: {paths.project_root.name}\n",
-        f"- Phase: {args.phase or 'unspecified'}\n",
-        f"- Blocker: {args.blocker or 'none'}\n",
+        f"# 会话摘要 - {date}\n\n",
+        "## 当前状态\n",
+        f"- 项目：{paths.project_root.name}\n",
+        f"- 阶段：{args.phase or '未指定'}\n",
+        f"- 阻塞项：{args.blocker or '无'}\n",
     ]
     if args.title:
-        lines.append(f"- Title: {args.title}\n")
+        lines.append(f"- 标题：{args.title}\n")
     lines.append("\n")
-    lines.extend(append_lines("Completed", args.completed))
-    lines.extend(append_lines("Key Decisions", args.decision))
-    lines.extend(append_lines("Changed Files", args.changed_file))
-    lines.extend(append_lines("Next Steps", args.next_step))
-    lines.extend(append_lines("Important Reminders", args.note))
+    lines.extend(append_lines("已完成", args.completed))
+    lines.extend(append_lines("关键决定", args.decision))
+    lines.extend(append_lines("变更文件", args.changed_file))
+    lines.extend(append_lines("下一步", args.next_step))
+    lines.extend(append_lines("重要提醒", args.note))
     if raw_notes.strip():
-        lines.append("## Raw Notes\n")
+        lines.append("## 原始记录\n")
         lines.append(raw_notes.strip() + "\n\n")
 
     if session_path.exists() and args.append:
@@ -655,10 +655,10 @@ def summarize_session(args: argparse.Namespace) -> None:
 
     files = scan_project(paths.project_root)
     context_bytes = write_context_md(paths, files, args.budget)
-    write_project_md(paths, files, context_bytes, phase=args.phase, status="session summarized")
+    write_project_md(paths, files, context_bytes, phase=args.phase, status="会话已总结")
     update_global_index(paths, {"last_session": str(session_path), "context_bytes": context_bytes})
-    print(f"Wrote session summary: {session_path}")
-    print(f"Refreshed CONTEXT.md ({context_bytes} bytes)")
+    print(f"已写入会话摘要：{session_path}")
+    print(f"已刷新 CONTEXT.md（{context_bytes} 字节）")
 
 
 def add_milestone(args: argparse.Namespace) -> None:
@@ -668,12 +668,12 @@ def add_milestone(args: argparse.Namespace) -> None:
     line = f"- {utc_now()} - {args.message.strip()}\n"
     if milestone_path.exists():
         content = milestone_path.read_text(encoding="utf-8")
-        if not content.startswith("# Milestones"):
-            content = "# Milestones\n\n" + content
+        if not content.startswith("# 里程碑"):
+            content = "# 里程碑\n\n" + content
     else:
-        content = "# Milestones\n\n"
+        content = "# 里程碑\n\n"
     milestone_path.write_text(content.rstrip() + "\n" + line, encoding="utf-8")
-    print(f"Added milestone: {milestone_path}")
+    print(f"已添加里程碑：{milestone_path}")
 
 
 def recall(args: argparse.Namespace) -> None:
@@ -703,7 +703,7 @@ def recall(args: argparse.Namespace) -> None:
             break
 
     if not matches:
-        print(f"No matches for: {args.query}")
+        print(f"未找到匹配：{args.query}")
         return
     for path, line_no, line in matches:
         print(f"{path}:{line_no}: {line}")
@@ -730,51 +730,62 @@ def status(args: argparse.Namespace) -> None:
     if args.json:
         print(json.dumps(data, ensure_ascii=False, indent=2))
         return
+    labels = {
+        "project": "项目",
+        "path": "路径",
+        "project_id": "项目 ID",
+        "store": "存储位置",
+        "files_indexed_now": "当前已索引文件数",
+        "context_bytes": "CONTEXT.md 字节数",
+        "index_bytes": "INDEX.md 字节数",
+        "sessions": "会话数",
+        "latest_session": "最新会话",
+    }
     for key, value in data.items():
-        print(f"{key}: {value}")
+        print(f"{labels.get(key, key)}: {value}")
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Compress, persist, and recall project context.")
-    parser.add_argument("--project", help="Project root path. Defaults to current working directory.")
-    parser.add_argument("--store", help="Context store path. Defaults to WORKBUDDY_CONTEXT_STORE or the skill-local context-store directory.")
+    parser = argparse.ArgumentParser(description="压缩、持久化并召回项目上下文。")
+    parser.add_argument("--project", help="项目根目录。默认是当前工作目录。")
+    parser.add_argument("--store", help="上下文存储路径。默认使用 WORKBUDDY_CONTEXT_STORE 或技能同级的 context-store 目录。")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    init_cmd = sub.add_parser("init", help="Create the project context store skeleton.")
-    init_cmd.add_argument("--phase", help="Current project phase.")
+    init_cmd = sub.add_parser("init", help="创建项目上下文存储骨架。")
+    init_cmd.add_argument("--phase", help="当前项目阶段。")
     init_cmd.set_defaults(func=init_project)
 
-    compress_cmd = sub.add_parser("compress", help="Scan the project and generate PROJECT.md, CONTEXT.md, INDEX.md, and snapshots.")
-    compress_cmd.add_argument("--budget", type=int, default=DEFAULT_BUDGET_BYTES, help="Maximum CONTEXT.md size in bytes.")
-    compress_cmd.add_argument("--phase", help="Current project phase.")
+    compress_cmd = sub.add_parser("compress", help="扫描项目并生成 PROJECT.md、CONTEXT.md、INDEX.md 和快照。")
+    compress_cmd.add_argument("--budget", type=int, default=DEFAULT_BUDGET_BYTES, help="CONTEXT.md 的最大字节数。")
+    compress_cmd.add_argument("--phase", help="当前项目阶段。")
     compress_cmd.set_defaults(func=compress_project)
 
-    summarize_cmd = sub.add_parser("summarize", help="Write a structured session summary and refresh compressed context.")
+    summarize_cmd = sub.add_parser("summarize", help="写入结构化会话摘要并刷新压缩上下文。")
     summarize_cmd.add_argument("--budget", type=int, default=DEFAULT_BUDGET_BYTES)
-    summarize_cmd.add_argument("--date", help="Session date in YYYY-MM-DD format. Defaults to today.")
-    summarize_cmd.add_argument("--title", help="Short session title.")
-    summarize_cmd.add_argument("--phase", help="Current project phase.")
-    summarize_cmd.add_argument("--blocker", help="Current blocker, if any.")
-    summarize_cmd.add_argument("--completed", action="append", default=[], help="Completed work item. Repeatable.")
-    summarize_cmd.add_argument("--decision", action="append", default=[], help="Key decision. Repeatable.")
-    summarize_cmd.add_argument("--changed-file", action="append", default=[], help="Changed file path and note. Repeatable.")
-    summarize_cmd.add_argument("--next-step", action="append", default=[], help="Next step. Repeatable.")
-    summarize_cmd.add_argument("--note", action="append", default=[], help="Important reminder. Repeatable.")
-    summarize_cmd.add_argument("--from-file", help="Markdown/text file with raw notes to append.")
-    summarize_cmd.add_argument("--append", action="store_true", help="Append to an existing same-day summary.")
+    summarize_cmd.add_argument("--date", help="会话日期，格式为 YYYY-MM-DD。默认是今天。")
+    summarize_cmd.add_argument("--title", help="简短的会话标题。")
+    summarize_cmd.add_argument("--phase", help="当前项目阶段。")
+    summarize_cmd.add_argument("--blocker", help="当前阻塞项（如有）。")
+    summarize_cmd.add_argument("--completed", action="append", default=[], help="已完成事项。可重复。")
+    summarize_cmd.add_argument("--decision", action="append", default=[], help="关键决定。可重复。")
+    summarize_cmd.add_argument("--changed-file", action="append", default=[], help="变更文件路径和说明。可重复。")
+    summarize_cmd.add_argument("--next-step", action="append", default=[], help="下一步。可重复。")
+    summarize_cmd.add_argument("--note", action="append", default=[], help="重要提醒。可重复。")
+    summarize_cmd.add_argument("--from-file", help="要追加的 Markdown/文本原始记录文件。")
+    summarize_cmd.add_argument("--append", action="store_true", help="追加到已有的当日摘要。")
     summarize_cmd.set_defaults(func=summarize_session)
 
-    recall_cmd = sub.add_parser("recall", help="Search project memory by keyword.")
-    recall_cmd.add_argument("query", help="Keyword or phrase to search for.")
+    recall_cmd = sub.add_parser("recall", help="按关键词搜索项目记忆。")
+    recall_cmd.add_argument("query", help="要搜索的关键词或短语。")
     recall_cmd.add_argument("--limit", type=int, default=20)
     recall_cmd.set_defaults(func=recall)
 
-    milestone_cmd = sub.add_parser("milestone", help="Record a durable milestone that should not be compressed away.")
-    milestone_cmd.add_argument("--message", required=True, help="Milestone text.")
+    milestone_cmd = sub.add_parser("milestone", help="记录不应被压缩掉的持久里程碑。")
+    milestone_cmd.add_argument("--message", required=True, help="里程碑文本。")
     milestone_cmd.set_defaults(func=add_milestone)
 
-    status_cmd = sub.add_parser("status", help="Show context store status.")
-    status_cmd.add_argument("--json", action="store_true", help="Print JSON.")
+    status_cmd = sub.add_parser("status", help="显示上下文存储状态。")
+    status_cmd.add_argument("--json", action="store_true", help="输出 JSON。")
     status_cmd.set_defaults(func=status)
 
     return parser
@@ -787,8 +798,8 @@ def main(argv: list[str] | None = None) -> int:
         args.func(args)
     except KeyboardInterrupt:
         return 130
-    except Exception as exc:  # noqa: BLE001 - CLI should return clean errors.
-        print(f"error: {exc}", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001 - CLI 应返回简洁错误。
+        print(f"错误：{exc}", file=sys.stderr)
         return 1
     return 0
 

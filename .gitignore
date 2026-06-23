@@ -31,7 +31,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Local context stores and generated session data should not be published.
+# 本地上下文存储和生成的会话数据不应发布。
 .workbuddy/
 context-store/
 context-compressor/context-store/

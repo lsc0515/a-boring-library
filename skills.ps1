@@ -24,7 +24,7 @@ foreach ($candidate in $bashCandidates) {
 }
 
 if (-not $bash) {
-  throw 'Git Bash not found. Install Git for Windows or run skills.sh from bash.'
+  throw '未找到 Git Bash。请安装 Git for Windows，或直接在 bash 中运行 skills.sh。'
 }
 
 & $bash "$repoRoot/skills.sh" $Target

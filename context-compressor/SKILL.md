@@ -1,112 +1,112 @@
 ---
 name: context-compressor
-description: Terminal AI context compression and project session persistence for Codex CLI, Claude Code, cc-switch, WorkBuddy, and similar command-line AI workflows. Use whenever the user asks to compress or save project context, persist or resume a terminal AI session, create searchable session summaries, recall prior decisions, mark milestones, inspect context-store status, or implement commands like /compress, /recall, /summarize, /status, /milestone. Also use for Chinese requests such as 压缩上下文, 保存上下文, 总结本轮会话, 续接/恢复会话, 召回之前进展, 记录里程碑, 查看上下文状态, or 让终端 AI 记住项目进度. Use at explicit session start/end handoff moments to load or refresh PROJECT.md, CONTEXT.md, INDEX.md, and sessions in the skill-local context-store directory beside SKILL.md.
+description: 面向终端 AI 工作流的上下文压缩与项目会话持久化技能，适用于 Codex CLI、Claude Code、cc-switch、WorkBuddy 等。用户只要提到压缩上下文、保存项目记忆、恢复会话、召回之前决定、记录里程碑、查看上下文状态，或使用 /compress、/recall、/summarize、/status、/milestone 这类命令时，都应使用该技能。遇到中文请求如“压缩上下文”“保存上下文”“总结本轮会话”“续接/恢复会话”“召回之前进展”“记录里程碑”“查看上下文状态”“让终端 AI 记住项目进度”时，也应触发。会话开始或结束时，使用该技能加载或刷新 `SKILL.md` 同级目录里的 `PROJECT.md`、`CONTEXT.md`、`INDEX.md` 和 `sessions/`。
 ---
 
-# Context Compressor
+# 上下文压缩器
 
-## Overview
+## 概览
 
-Use this skill to create and maintain a local, project-scoped memory store that keeps the next Codex session grounded without loading the entire repository or conversation history. It stores compact context in `PROJECT.md`, `CONTEXT.md`, `INDEX.md`, daily session summaries, and snapshots under `<skill-folder>/context-store/projects/{project-hash}/` by default.
+使用这个技能，可以创建并维护一个本地、按项目隔离的记忆库，让下一次 Codex 会话在不加载整个仓库或完整聊天记录的情况下，也能保持上下文连贯。它会把紧凑上下文存到 `<skill-folder>/context-store/projects/{project-hash}/` 下的 `PROJECT.md`、`CONTEXT.md`、`INDEX.md`、每日会话摘要和快照中。
 
-The default store lives in the same skill folder as `SKILL.md`, so each installed copy of the skill keeps its own local memory. Override it with `--store` or `WORKBUDDY_CONTEXT_STORE` only when the user explicitly wants a shared or custom store.
+默认存储位置就在 `SKILL.md` 所在的技能目录里，所以每个安装副本都有自己的本地记忆库。只有在用户明确要求共享或自定义存储时，才使用 `--store` 或 `WORKBUDDY_CONTEXT_STORE` 覆盖默认位置。
 
-The bundled script is deterministic and standard-library only:
+内置脚本只依赖 Python 标准库，行为是确定性的：
 
 ```bash
 python scripts/context_compressor.py --project /path/to/project compress
 ```
 
-## Core Workflow
+## 核心流程
 
-1. Resolve the project root from the user's workspace or `--project`.
-2. Initialize the context store if it does not exist.
-3. Run `compress` to create or refresh:
-   - `PROJECT.md`: layer 0 metadata and durable status.
-   - `CONTEXT.md`: layer 1 compact working context capped by byte budget.
-   - `INDEX.md`: layer 2 file tree, symbols, and TODO/FIXME markers.
-   - `sessions/`: layer 3 summaries and milestones.
-   - `snapshots/`: JSON file tree and symbol snapshots.
-4. At the end of meaningful work, run `summarize` with completed work, decisions, changed files, next steps, and reminders.
-5. When the user asks what happened before, run `recall` before guessing from memory.
+1. 从用户工作区或 `--project` 解析项目根目录。
+2. 如果上下文库不存在，则初始化它。
+3. 执行 `compress`，生成或刷新：
+   - `PROJECT.md`：第 0 层元数据和持久状态。
+   - `CONTEXT.md`：第 1 层紧凑工作上下文，受字节预算限制。
+   - `INDEX.md`：第 2 层文件树、符号和 TODO/FIXME 标记。
+   - `sessions/`：第 3 层摘要和里程碑。
+   - `snapshots/`：JSON 形式的文件树和符号快照。
+4. 在有意义的工作结束时，运行 `summarize`，写入已完成工作、决定、变更文件、后续步骤和提醒。
+5. 当用户询问之前发生了什么时，先运行 `recall`，不要靠记忆猜。
 
-The skill cannot install a true terminal shutdown hook by itself. Treat explicit user requests such as "compress", "summarize this session", "recall", "resume", "session end", or `/compress` as lifecycle boundaries and invoke the script.
+这个技能本身不能安装真正的终端退出钩子。把用户显式提出的“compress”“summarize this session”“recall”“resume”“session end”或 `/compress` 之类请求视为生命周期边界，并调用脚本。
 
-## Commands
+## 命令
 
-Use the script path inside the skill folder. If the current working directory is the skill folder, `scripts/context_compressor.py` is enough; otherwise pass the absolute path.
+使用技能目录中的脚本路径。如果当前工作目录就是技能目录，那么直接用 `scripts/context_compressor.py` 即可；否则传入绝对路径。
 
-### Initialize
+### 初始化
 
-Create the storage skeleton for a project:
-
-```bash
-python scripts/context_compressor.py --project /path/to/project init --phase "Phase 1"
-```
-
-### Compress
-
-Scan the project and refresh compact context:
+创建某个项目的存储骨架：
 
 ```bash
-python scripts/context_compressor.py --project /path/to/project compress --budget 1000000 --phase "Phase 1"
+python scripts/context_compressor.py --project /path/to/project init --phase "第一阶段"
 ```
 
-### Summarize
+### 压缩
 
-Persist an end-of-session handoff and refresh `CONTEXT.md`:
+扫描项目并刷新紧凑上下文：
+
+```bash
+python scripts/context_compressor.py --project /path/to/project compress --budget 1000000 --phase "第一阶段"
+```
+
+### 总结
+
+持久化一次会话交接，并刷新 `CONTEXT.md`：
 
 ```bash
 python scripts/context_compressor.py --project /path/to/project summarize \
-  --title "Implemented context compressor skill" \
-  --phase "Phase 1" \
-  --completed "Created store skeleton and compression script" \
-  --decision "Use skill-local context-store with project-hash isolation" \
+  --title "已实现上下文压缩技能" \
+  --phase "第一阶段" \
+  --completed "创建了存储骨架和压缩脚本" \
+  --decision "使用技能同级的 context-store，并按项目哈希隔离" \
   --changed-file "context-compressor/scripts/context_compressor.py" \
-  --next-step "Wire external terminal hooks if automation is needed" \
-  --note "Skill scripts use only Python standard library"
+  --next-step "如需自动化，再接入外部终端钩子" \
+  --note "技能脚本只使用 Python 标准库"
 ```
 
-Repeat `--completed`, `--decision`, `--changed-file`, `--next-step`, and `--note` as needed. Use `--append` to add another summary block to an existing daily summary.
+`--completed`、`--decision`、`--changed-file`、`--next-step` 和 `--note` 都可以重复使用。`--append` 可用于在已有的同日摘要后继续追加。
 
-### Recall
+### 召回
 
-Search the local memory store:
+在本地记忆库中搜索：
 
 ```bash
-python scripts/context_compressor.py --project /path/to/project recall "project-hash"
+python scripts/context_compressor.py --project /path/to/project recall "项目哈希"
 ```
 
-### Status
+### 状态
 
-Inspect context size and session count:
+查看上下文大小和会话数量：
 
 ```bash
 python scripts/context_compressor.py --project /path/to/project status --json
 ```
 
-### Milestone
+### 里程碑
 
-Record a durable decision or checkpoint that should not be compressed away:
+记录一个不应被压缩掉的持久决定或检查点：
 
 ```bash
-python scripts/context_compressor.py --project /path/to/project milestone --message "Auth migration completed and verified."
+python scripts/context_compressor.py --project /path/to/project milestone --message "认证迁移已完成并验证。"
 ```
 
-## Resume Procedure
+## 恢复流程
 
-When starting or resuming a project:
+开始或恢复项目时：
 
-1. Run `status` to find the project store.
-2. Read `PROJECT.md` first.
-3. Read `CONTEXT.md` for the current compact working set.
-4. Read `INDEX.md` only when file tree, symbol lookup, or TODO context is needed.
-5. Use `recall <keyword>` for older decisions, blockers, or handoffs.
+1. 先运行 `status`，找到项目存储位置。
+2. 先读 `PROJECT.md`。
+3. 再读 `CONTEXT.md`，获取当前紧凑工作集。
+4. 只有在需要文件树、符号查找或 TODO 上下文时，才读 `INDEX.md`。
+5. 对更早的决定、阻塞或交接，使用 `recall <keyword>`。
 
-## Compression Policy
+## 压缩策略
 
-Prefer project facts over generic commentary. Keep durable state, changed files, decisions, blockers, commands, and next steps. Avoid storing secrets. The default byte budget is 1,000,000 bytes for `CONTEXT.md`.
+优先保留项目事实，而不是泛泛而谈的评论。保留持久状态、变更文件、决定、阻塞项、命令和后续步骤。避免存储敏感信息。`CONTEXT.md` 的默认字节预算为 1,000,000。
 
-Read `references/compression-policy.md` when tuning the budget, deciding what belongs in each layer, or explaining tradeoffs.
+当需要调预算、判断每一层该放什么，或解释取舍时，请阅读 `references/compression-policy.md`。
 
-Read `references/session-summary-template.md` when manually composing or reviewing session summaries.
+当你手工编写或审阅会话摘要时，请阅读 `references/session-summary-template.md`。

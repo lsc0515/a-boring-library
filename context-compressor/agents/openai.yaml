@@ -1,6 +1,6 @@
 interface:
-  display_name: "Context Compressor"
-  short_description: "Compress and recall project context"
-  default_prompt: "Use $context-compressor to compress this project context and prepare a resumable session summary."
+  display_name: "上下文压缩器"
+  short_description: "压缩并召回项目上下文"
+  default_prompt: "使用 $context-compressor 压缩当前项目上下文，并准备一份可继续恢复的会话摘要。"
 policy:
   allow_implicit_invocation: true
