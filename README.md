@@ -49,7 +49,19 @@ bash skills.sh
 ```
 
 That installs every skill in the repo into both Codex and Claude skill folders. Use `bash skills.sh codex`, `bash skills.sh claude`, or `bash skills.sh ccswitch` to target one side only. `bash skills.sh all` installs to all three.
-On Windows, run it with Git Bash: `C:\Program Files\Git\bin\bash.exe skills.sh`.
+On Windows, the simplest option is the cmd wrapper:
+
+```powershell
+.\skills.cmd ccswitch
+```
+
+If you're staying in PowerShell and want to call the script directly, use:
+
+```powershell
+.\skills.ps1
+```
+
+The PowerShell version accepts the same targets: `codex`, `claude`, `ccswitch`, `both`, and `all`.
 
 ## cc-switch
 
